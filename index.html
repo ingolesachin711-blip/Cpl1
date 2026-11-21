@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10131c"><link rel="manifest" href="manifest.json">
+<title>CPL 1 - Cricket Premier League</title>
+<style>
+:root{--bg:#0b0e14;--panel:#151a25;--panel2:#1c2331;--gold:#f5b942;--text:#f4f6fb;--muted:#aab3c4;--line:#2c3547;--green:#36c98f;--red:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#101522,#080a10 65%);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:22px 16px 16px;background:#101522;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.wrap{max-width:1100px;margin:auto}h1{margin:0;color:var(--gold);font-size:25px;letter-spacing:1px}header p{margin:4px 0 0;color:var(--muted);font-size:12px;letter-spacing:2px}
+nav{display:flex;gap:8px;overflow:auto;padding:12px 0}.tab,button{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:10px 13px;font-weight:650;cursor:pointer;white-space:nowrap}.tab.active,button.primary{background:var(--gold);color:#16120a;border-color:var(--gold)}
+main{padding:4px 14px 35px}.page{display:none}.page.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:10px 0 16px}
+.card{background:linear-gradient(145deg,var(--panel),#111620);border:1px solid var(--line);border-radius:15px;padding:15px}.label{color:var(--muted);font-size:12px}.value{font-size:26px;font-weight:800;margin-top:5px}.gold{color:var(--gold)}
+h2{font-size:19px;margin:16px 0 10px}h3{font-size:15px;margin:0 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+input,select{width:100%;background:#0c111a;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:10px;font:inherit;min-width:0}
+label{display:block;color:var(--muted);font-size:12px;margin:0 0 5px}.field{margin:8px 0;min-width:90px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:620px;background:var(--panel)}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--gold);background:#1b2230;position:sticky;top:0}td.num{text-align:right;font-variant-numeric:tabular-nums}
+.small{font-size:12px;color:var(--muted)}.pill{display:inline-block;background:#2b2630;color:var(--gold);padding:4px 8px;border-radius:99px;font-size:11px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.danger{border-color:#743b43;color:#ff9b9b}.notice{padding:11px 13px;border:1px solid #66512b;background:#282113;color:#f6d99b;border-radius:11px;font-size:12px;line-height:1.5;margin:12px 0}
+.playerrow{display:grid;grid-template-columns:minmax(130px,1.5fr) repeat(11,minmax(65px,1fr));gap:6px;align-items:center;padding:8px;border-bottom:1px solid var(--line);min-width:800px}
+.playerrow input,.playerrow select{padding:8px;font-size:13px}.playerhead{color:var(--gold);font-size:11px;font-weight:700}.playerbox{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.empty{color:var(--muted);padding:22px;text-align:center}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+@media(min-width:700px){header{padding-left:24px}main{padding:4px 24px 40px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>🏏 CPL 1</h1><p>CRICKET PREMIER LEAGUE · PLAYER STATISTICS</p></div></header>
+<div class="wrap">
+<nav>
+<button class="tab active" data-page="home">Dashboard</button><button class="tab" data-page="players">Players</button><button class="tab" data-page="match">Add Match</button><button class="tab" data-page="leaderboard">Leaderboard</button><button class="tab" data-page="backup">Backup</button>
+</nav>
+<main>
+<section id="home" class="page active">
+<div class="sectionhead"><div><h2>Season Dashboard</h2><div class="small">All match performances combined</div></div><span class="pill">DARK LEAGUE THEME</span></div>
+<div class="grid" id="summary"></div>
+<h2>🏆 Current Leaders</h2><div class="grid" id="leaders"></div>
+<div class="notice">Data is saved in this browser on this device. Use Backup → Export regularly so your season record is safe.</div>
+</section>
+<section id="players" class="page">
+<div class="sectionhead"><div><h2>Players</h2><div class="small">Add more players whenever your group grows.</div></div><button class="primary" id="addPlayer">+ Add Player</button></div>
+<div class="row"><div class="field"><label>New player name</label><input id="newName" placeholder="Enter player name"></div></div>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>Player</th><th>Matches</th><th>Runs</th><th>Wickets</th><th>Action</th></tr></thead><tbody id="playersTable"></tbody></table></div>
+</section>
+<section id="match" class="page">
+<h2>Add Match Scorecard</h2>
+<div class="notice">Enter each player's batting and bowling figures for this match. For bowling, enter balls bowled (not overs: 12 balls = 2 overs). Each bowler is limited to 12 balls. Add Maiden overs and tick Hat-trick when achieved. Leave unused fields at 0.</div>
+<div class="grid">
+<div class="field"><label>Match date</label><input type="date" id="matchDate"></div>
+<div class="field"><label>Team A name</label><input id="teamA" value="Team A"></div>
+<div class="field"><label>Team B name</label><input id="teamB" value="Team B"></div>
+</div>
+<div class="sectionhead"><h3>Player Scorecard</h3><span class="small">Tick Played for players who took part.</span></div>
+<div class="playerbox"><div class="playerrow playerhead"><div>Player</div><div>Team</div><div>Played</div><div>Runs</div><div>Balls</div><div>4s</div><div>6s</div><div>Bowled balls</div><div>Runs given</div><div>Wkts</div><div>Maiden</div><div>Hat-trick</div></div><div id="matchRows"></div></div>
+<div class="actions"><button class="primary" id="saveMatch">Save Match</button><button id="clearMatch">Clear Form</button></div>
+</section>
+<section id="leaderboard" class="page">
+<h2>🏆 Season Leaderboard</h2>
+<div class="row"><div class="field"><label>Rank by</label><select id="rankBy"><option value="runs">Most Runs</option><option value="wickets">Most Wickets</option><option value="sixes">Most Sixes</option><option value="fours">Most Fours</option><option value="highest">Highest Score</option><option value="sr">Best Strike Rate</option><option value="econ">Best Economy</option><option value="conceded">Most Runs Conceded</option></select></div></div>
+<div class="tablewrap"><table><thead><tr><th>Rank</th><th>Player</th><th>Mat</th><th>Runs</th><th>HS</th><th>4s</th><th>6s</th><th>Wkts</th><th>Runs Conceded</th><th>SR</th><th>Eco</th></tr></thead><tbody id="leaderTable"></tbody></table></div>
+<h2>Player Statistics</h2><div class="field"><label>Select player</label><select id="profileSelect"></select></div><div id="profile"></div>
+</section>
+<section id="backup" class="page">
+<h2>Data Backup</h2><p class="small">Export your CPL 1 data to a file. If you change phone or browser, import that file to restore your records.</p>
+<div class="actions"><button class="primary" id="exportData">Export Backup</button><label class="tab" for="importFile">Import Backup</label><input type="file" id="importFile" accept="application/json" style="display:none"></div>
+<div class="notice">Important: clearing browser data or uninstalling the browser can erase locally saved records. Export backups after match days.</div>
+</section>
+</main></div>
+<script>
+const initial=["SACHIN INGOLE","JAYDEV INGOLE","RUSHIKESH INGOLE","KRISHNA GAWALI","RAMESH GAWALI","VINAYAK GAWALI","ASHOK PAL","PRAMOD GABHANE","RUSHI GABHANE","BHAGWAT WANKHEDE","DUGGU WANKHEDE","KARTIK DHOMBLE","KRISHNA GIRI","NARAYAN ROUT","MAYUR GADE"];
+const KEY="cpl1_data_v1";
+let db=JSON.parse(localStorage.getItem(KEY)||"null")||{players:initial.map((name,i)=>({id:"p"+(i+1),name})),matches:[]};
+function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function stats(p){let s={matches:0,innings:0,runs:0,balls:0,fours:0,sixes:0,wickets:0,bb:0,conceded:0,maidens:0,hattricks:0,twoW:0,threeW:0,fiveW:0,highest:0,bestW:0,bestR:0};db.matches.forEach(m=>{let x=m.rows.find(r=>r.id===p.id);if(x&&x.played){s.matches++;if(x.bat){s.innings++;s.runs+=x.runs;s.balls+=x.balls;s.fours+=x.fours;s.sixes+=x.sixes;s.highest=Math.max(s.highest,x.runs)}s.wickets+=x.wickets;s.bb+=x.bowled;s.conceded+=x.given;s.maidens+=(x.maidens||0);s.hattricks+=(x.hattrick?1:0);if(x.wickets>=2)s.twoW++;if(x.wickets>=3)s.threeW++;if(x.wickets>=5)s.fiveW++;if(x.wickets>s.bestW||(x.wickets===s.bestW&&x.given<s.bestR)){s.bestW=x.wickets;s.bestR=x.given}}});s.sr=s.balls?s.runs/s.balls*100:0;s.econ=s.bb?s.conceded/(s.bb/6):0;return s}
+function allStats(){return db.players.map(p=>({p,s:stats(p)}))}
+function renderHome(){let a=allStats(),totalRuns=a.reduce((n,x)=>n+x.s.runs,0),totalW=a.reduce((n,x)=>n+x.s.wickets,0);
+document.getElementById("summary").innerHTML=[["Players",db.players.length],["Matches",db.matches.length],["Total Runs",totalRuns],["Total Wickets",totalW],["Runs Conceded",a.reduce((n,x)=>n+x.s.conceded,0)]].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div></div>`).join("");
+let best=(key,fn)=>a.slice().sort((x,y)=>fn(y.s)-fn(x.s))[0];let picks=[["🧡 Orange Cap","Most Runs",x=>x.runs,"runs"],["💜 Purple Cap","Most Wickets",x=>x.wickets,"wickets"],["💥 Most Sixes","Sixes",x=>x.sixes,"sixes"],["🔥 Most Fours","Fours",x=>x.fours,"fours"]];
+document.getElementById("leaders").innerHTML=picks.map(([title,sub,fn])=>{let b=best("",fn);return `<div class="card"><div class="label">${title}</div><div class="value gold">${b?fn(b.s):0}</div><div class="small">${b?esc(b.p.name):"—"} · ${sub}</div></div>`}).join("")}
+function renderPlayers(){document.getElementById("playersTable").innerHTML=db.players.map((p,i)=>{let s=stats(p);return `<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${s.matches}</td><td>${s.runs}</td><td>${s.wickets}</td><td><button class="danger" onclick="removePlayer('${p.id}')">Remove</button></td></tr>`}).join("")||`<tr><td colspan="6">No players yet</td></tr>`}
+function renderRows(){document.getElementById("matchRows").innerHTML=db.players.map(p=>`<div class="playerrow" data-id="${p.id}"><div><b>${esc(p.name)}</b></div><div><select class="team"><option>A</option><option>B</option></select></div><div><input class="played" type="checkbox" style="width:auto"></div><div><input class="runs" type="number" min="0" value="0"></div><div><input class="balls" type="number" min="0" value="0"></div><div><input class="fours" type="number" min="0" value="0"></div><div><input class="sixes" type="number" min="0" value="0"></div><div><input class="bowled" type="number" min="0" max="12" value="0"></div><div><input class="given" type="number" min="0" value="0"></div><div><input class="wickets" type="number" min="0" value="0"></div><div><input class="maiden" type="number" min="0" max="2" value="0"></div><div><input class="hattrick" type="checkbox" style="width:auto"></div></div>`).join("")}
+function renderLeaderboard(){let key=document.getElementById("rankBy").value,a=allStats();let val=x=>({runs:x.s.runs,wickets:x.s.wickets,sixes:x.s.sixes,fours:x.s.fours,highest:x.s.highest,sr:x.s.sr,econ:x.s.econ,conceded:x.s.conceded}[key]);a.sort((x,y)=>key==="econ"?(x.s.bb?val(x)-val(y):1):(val(y)-val(x)));document.getElementById("leaderTable").innerHTML=a.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.p.name)}</td><td>${x.s.matches}</td><td>${x.s.runs}</td><td>${x.s.highest}</td><td>${x.s.fours}</td><td>${x.s.sixes}</td><td>${x.s.wickets}</td><td>${x.s.conceded}</td><td>${x.s.sr.toFixed(1)}</td><td>${x.s.bb?x.s.econ.toFixed(2):"—"}</td></tr>`).join("")}
+function renderProfileOptions(){let sel=document.getElementById("profileSelect"),old=sel.value;sel.innerHTML=db.players.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");if(db.players.some(p=>p.id===old))sel.value=old;renderProfile()}
+function renderProfile(){let p=db.players.find(p=>p.id===document.getElementById("profileSelect").value);if(!p){document.getElementById("profile").innerHTML="";return}let s=stats(p);document.getElementById("profile").innerHTML=`<div class="grid">${[["Matches",s.matches],["Runs",s.runs],["Highest",s.highest],["Fours",s.fours],["Sixes",s.sixes],["Wickets",s.wickets],["2W Hauls",s.twoW],["3W Hauls",s.threeW],["5W Hauls",s.fiveW],["Hat-tricks",s.hattricks],["Maiden Overs",s.maidens],["Strike Rate",s.sr.toFixed(2)],["Economy",s.bb?s.econ.toFixed(2):"—"],["Balls Faced",s.balls],["Balls Bowled",s.bb],["Runs Given",s.conceded],["Best Wkts in match",s.bestW]].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div></div>`).join("")}</div>`}
+function renderAll(){renderHome();renderPlayers();renderRows();renderLeaderboard();renderProfileOptions()}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{if(!b.dataset.page)return;document.querySelectorAll(".tab[data-page]").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===b.dataset.page));if(b.dataset.page==="leaderboard")renderLeaderboard()}));
+document.getElementById("addPlayer").onclick=()=>{let n=document.getElementById("newName").value.trim().toUpperCase();if(!n)return alert("Enter a player name.");if(db.players.some(p=>p.name.toLowerCase()===n.toLowerCase()))return alert("Player already exists.");db.players.push({id:"p"+Date.now(),name:n});document.getElementById("newName").value="";save()};
+window.removePlayer=id=>{if(db.matches.some(m=>m.rows.some(r=>r.id===id&&r.played)))return alert("This player has match records. Keep the player in the list to preserve statistics.");if(confirm("Remove this player?")){db.players=db.players.filter(p=>p.id!==id);save()}};
+document.getElementById("saveMatch").onclick=()=>{let rows=[...document.querySelectorAll("#matchRows .playerrow")].map(el=>{let g=c=>el.querySelector("."+c);return{id:el.dataset.id,team:g("team").value,played:g("played").checked,runs:+g("runs").value,balls:+g("balls").value,fours:+g("fours").value,sixes:+g("sixes").value,bowled:+g("bowled").value,given:+g("given").value,wickets:+g("wickets").value,maidens:+g("maiden").value,hattrick:g("hattrick").checked,bat:g("played").checked&&( +g("runs").value>0||+g("balls").value>0||+g("fours").value>0||+g("sixes").value>0)}}).filter(x=>x.played);
+if(!rows.length)return alert("Mark at least one player as Played.");for(let r of rows){if(r.bowled>12)return alert("Maximum bowling is 12 balls (2 overs) per player.");if(r.maidens>Math.floor(r.bowled/6))return alert("Maiden overs cannot exceed completed overs bowled.");if(r.fours*4+r.sixes*6>r.runs)return alert("A player's boundary runs cannot exceed their total runs.");if(r.balls<0||r.runs<0||r.wickets<0||r.bowled<0)return alert("Stats cannot be negative.");}
+let date=document.getElementById("matchDate").value||new Date().toISOString().slice(0,10);db.matches.push({date,teamA:document.getElementById("teamA").value,teamB:document.getElementById("teamB").value,rows});save();alert("Match saved! Season statistics updated.");document.querySelectorAll("#matchRows input").forEach(x=>{if(x.type==="checkbox")x.checked=false;else x.value=0});};
+document.getElementById("clearMatch").onclick=()=>{if(confirm("Clear all match entry fields?")){renderRows()}};
+document.getElementById("rankBy").onchange=renderLeaderboard;document.getElementById("profileSelect").onchange=renderProfile;
+document.getElementById("exportData").onclick=()=>{let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CPL1-backup.json";a.click();URL.revokeObjectURL(a.href)};
+document.getElementById("importFile").onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.players)||!Array.isArray(d.matches))throw 0;if(confirm("Import will replace current CPL 1 data. Continue?")){db=d;save();alert("Backup restored.")}}catch(err){alert("Invalid CPL 1 backup file.")}};r.readAsText(f)};
+document.getElementById("matchDate").value=new Date().toISOString().slice(0,10);
+renderAll();if("serviceWorker"in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body></html>
